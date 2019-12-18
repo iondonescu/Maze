@@ -1,47 +1,49 @@
 
-var cols, rows;
-var w = 40;
-var grid = [];// array pt fiecare celula (obiect)
-var current;// obiectul curent
-var stack = [];// stack for maze
-var cell ;
-let img;//the player
-let upp = 0;//
+var cols, rows; // number of cols and rows of canvas
+var w = 40; // dimension of a cell in canvas
+var grid = [];// array for each cell
+var current;// current object
+var stack = [];// stack for backtracking
+var cell ; // object created with class Cell
+let img; //the player
+let upp = 0; // for moving the player
 let down = 0;
-let position = 0;//index of the cell
+let position = 0;//keep track of player position
 
 function setup() {
-    img = loadImage('img/boy.png');
+
     var canvas = createCanvas(400, 400);
     canvas.center();
-
+    img = loadImage('img/boy.png');
     cols = floor(width / w);
     rows = floor(height / w);
-    //frameRate(10);
 
-
+// create an array that holds all cells
     for (var j = 0; j < rows; j++) {
         for (var i = 0; i < cols; i++) {
             cell = new Cell(i, j);
             grid.push(cell);
         }
     }
+    // make the first current
     current = grid[0];
 }
-
+// draw the canvas
 function draw() {
-    background(75);
+    background(75);// initial background of cavas
+    // show the grid
     for (var i = 0; i < grid.length; i++) {
         grid[i].show();
     }
+    // load the image
     image(img,upp,down,40,40);
-
+    //generating a make use depth first search algorithms and backtracking
+    // copyright https://www.youtube.com/watch?v=HyK_Q5rrcr4
     current.visited = true;
     var next = current.checkNeighbors();
     if (next) {
         next.visited = true;
-        stack.push(current);
-
+        stack.push(current);// use a stack to keep track of an end point and return
         removeWalls(current, next);
         current = next;
 
@@ -49,13 +51,15 @@ function draw() {
         current = stack.pop();
     }
 }
-
+// see again what is this for  at https://www.youtube.com/watch?v=D8UgRyRnvXU&t=48s
 function index(i, j) {
     if (i < 0 || j < 0 || i > cols - 1 || j > rows - 1) {
         return -1;
     }
     return (i + j * cols);
 }
+
+// create each cell as an object initial with all walls
 class Cell {
     constructor(i, j) {
         this.i = i;
@@ -63,7 +67,7 @@ class Cell {
         this.walls = [true, true, true, true];
         this.visited = false;
 
-
+        // function for keeping track of each cell neighbours
         this.checkNeighbors = function () {
             var neighbors = [];
 
@@ -93,7 +97,7 @@ class Cell {
 
         }
 
-
+// draw lines for each object cell
         this.show = function () {
             var x = this.i * w;
             var y = this.j * w;
@@ -110,11 +114,13 @@ class Cell {
             if (this.walls[3]) {
                 line(x, y + w, x, y);
             }
+            // create a rectangle with different color for each visited cell
             if (this.visited) {
                 noStroke();
                 fill(200, 10, 192, 100);
                 rect(x, y, w, w);
             }
+            // create a rectangle for the last object
             fill(100,100,192,100);
             rect(360,360,w,w);
         }
@@ -123,7 +129,8 @@ class Cell {
 }
 
 
-
+// remove walls between  neighbors
+// see again https://www.youtube.com/watch?v=D8UgRyRnvXU&t=48s
 function removeWalls(a, b) {
 
     var x = a.i - b.i;
@@ -147,90 +154,40 @@ function removeWalls(a, b) {
 
 }
 
-// we want to star from left of canvas , and when we reach first right edge make it an exit
-// the rest of edges must have walls
-
 
 //player moves
 function keyPressed(){
-    //console.log(grid.length)
-    if(keyCode == UP_ARROW){
+//check if there are walls on top, bottom,right and left player, if not you can move the player
 
+    if(keyCode == UP_ARROW){
             if (!grid[position].walls[0]) {
                 down = down - 40;
-                position = position - 10;//corecte
-                console.log(position);
+                position = position - 10;//update the position of player
             }
-
     }
+
     if(keyCode == DOWN_ARROW){
-
-
             if (!grid[position].walls[2]) {
                 down = down + 40;
                 position = position + 10;
-                console.log(position);
             }
-
     }
+
     if(keyCode == RIGHT_ARROW){
             if (!grid[position].walls[1]) {
                 upp = upp + 40;
                 position = position + 1;
-                console.log(position);
+
             }
-
     }
+
     if(keyCode == LEFT_ARROW){
-
-
             if (!grid[position].walls[3]) {
                 upp = upp - 40;
                 position = position - 1;
-                console.log(position);
             }
-
-
     }
 }
-
-    // function getKeyAndMove(e) {
-    //     var key_code = e.which || e.keyCode;
-    //     switch (key_code) {
-    //         case 37: //left arrow key
-    //             moveLeft();
-    //             break;
-    //         case 38: //Up arrow key
-    //             moveUp();
-    //             break;
-    //         case 39: //right arrow key
-    //             moveRight();
-    //             break;
-    //         case 40: //down arrow key
-    //             moveDown();
-    //             break;
-    //     }
-    // }
-    //
-    // function moveLeft() {
-    //     objImage.style.left = parseInt(objImage.style.left) - 40 + 'px';
-    //     console.log(objImage.style.left);
-    // }
-    //
-    // function moveUp() {
-    //     objImage.style.top = parseInt(objImage.style.top) - 40 + 'px';
-    //     console.log(objImage.style.top);
-    // }
-    //
-    // function moveRight() {
-    //     objImage.style.left = parseInt(objImage.style.left) + 40 + 'px';
-    //     console.log(objImage.style.left);
-    // }
-    //
-    // function moveDown() {
-    //     objImage.style.top = parseInt(objImage.style.top) + 40 + 'px';
-    //     console.log(objImage.style.top);
-    // }
 
 
 
