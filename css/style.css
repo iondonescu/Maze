@@ -1,0 +1,14 @@
+body{
+    background: aquamarine;
+}
+img{
+    z-index: 1;
+}
+canvas {
+    /*position:absolute;*/
+    top:100px;
+    left: 0;
+    right: 0;
+    margin:auto;
+    z-index: -1;
+}
