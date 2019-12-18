@@ -4,19 +4,21 @@ var w = 40;
 var grid = [];// array pt fiecare celula (obiect)
 var current;// obiectul curent
 var stack = [];// stack for maze
-var gridCell = [];
-var objImage= document.getElementById("player");
-objImage.style.position='relative';
-objImage.style.left='0px';
-objImage.style.top='0px';
 var cell ;
+let img;//the player
+let upp = 0;//
+let down = 0;
+let position = 0;//index of the cell
 
 function setup() {
+    img = loadImage('img/boy.png');
     var canvas = createCanvas(400, 400);
+    canvas.center();
 
     cols = floor(width / w);
     rows = floor(height / w);
-    frameRate(10);
+    //frameRate(10);
+
 
     for (var j = 0; j < rows; j++) {
         for (var i = 0; i < cols; i++) {
@@ -28,10 +30,12 @@ function setup() {
 }
 
 function draw() {
-    background(51);
+    background(75);
     for (var i = 0; i < grid.length; i++) {
         grid[i].show();
     }
+    image(img,upp,down,40,40);
+
     current.visited = true;
     var next = current.checkNeighbors();
     if (next) {
@@ -52,69 +56,76 @@ function index(i, j) {
     }
     return (i + j * cols);
 }
+class Cell {
+    constructor(i, j) {
+        this.i = i;
+        this.j = j;
+        this.walls = [true, true, true, true];
+        this.visited = false;
 
-function Cell(i, j) {
-    this.i = i;
-    this.j = j;
-    this.walls = [true, true, true, true];
-    this.visited = false;
 
-    this.checkNeighbors = function () {
-        var neighbors = [];
+        this.checkNeighbors = function () {
+            var neighbors = [];
 
-        var top = grid[index(i, j - 1)];
-        var right = grid[index(i + 1, j)];
-        var bottom = grid[index(i, j + 1)];
-        var left = grid[index(i - 1, j)];
+            var top = grid[index(i, j - 1)];
+            var right = grid[index(i + 1, j)];
+            var bottom = grid[index(i, j + 1)];
+            var left = grid[index(i - 1, j)];
 
-        if (top && !top.visited) {
-            neighbors.push(top);
-        }
-        if (right && !right.visited) {
-            neighbors.push(right);
-        }
-        if (bottom && !bottom.visited) {
-            neighbors.push(bottom);
-        }
-        if (left && !left.visited) {
-            neighbors.push(left);
-        }
-        if (neighbors.length > 0) {
-            var r = floor(random(0, neighbors.length));
-            return neighbors[r];
-        } else {
-            return undefined;
+            if (top && !top.visited) {
+                neighbors.push(top);
+            }
+            if (right && !right.visited) {
+                neighbors.push(right);
+            }
+            if (bottom && !bottom.visited) {
+                neighbors.push(bottom);
+            }
+            if (left && !left.visited) {
+                neighbors.push(left);
+            }
+            if (neighbors.length > 0) {
+                var r = floor(random(0, neighbors.length));
+                return neighbors[r];
+            } else {
+                return undefined;
+            }
+
         }
 
-    }
 
-    this.show = function () {
-        var x = this.i * w;
-        var y = this.j * w;
-        stroke(256);
-        if (this.walls[0]) {
-            line(x, y, x + w, y);
+        this.show = function () {
+            var x = this.i * w;
+            var y = this.j * w;
+            stroke(256);
+            if (this.walls[0]) {
+                line(x, y, x + w, y);
+            }
+            if (this.walls[1]) {
+                line(x + w, y, x + w, y + w);
+            }
+            if (this.walls[2]) {
+                line(x + w, y + w, x, y + w);
+            }
+            if (this.walls[3]) {
+                line(x, y + w, x, y);
+            }
+            if (this.visited) {
+                noStroke();
+                fill(200, 10, 192, 100);
+                rect(x, y, w, w);
+            }
+            fill(100,100,192,100);
+            rect(360,360,w,w);
         }
-        if (this.walls[1]) {
-            line(x + w, y, x + w, y + w);
-        }
-        if (this.walls[2]) {
-            line(x + w, y + w, x, y + w);
-        }
-        if (this.walls[3]) {
-            line(x, y + w, x, y);
-        }
-        if (this.visited) {
-            noStroke();
-            fill(192, 192, 192, 100);
-            rect(x, y, w, w);
-        }
+
     }
 }
 
 
+
 function removeWalls(a, b) {
-    console.log(a)
+
     var x = a.i - b.i;
     if (a.i != 0 || b.i != 0) {
         if (x === 1) {
@@ -141,44 +152,85 @@ function removeWalls(a, b) {
 
 
 //player moves
+function keyPressed(){
+    //console.log(grid.length)
+    if(keyCode == UP_ARROW){
 
-    function getKeyAndMove(e) {
-        var key_code = e.which || e.keyCode;
-        switch (key_code) {
-            case 37: //left arrow key
-                moveLeft();
-                break;
-            case 38: //Up arrow key
-                moveUp();
-                break;
-            case 39: //right arrow key
-                moveRight();
-                break;
-            case 40: //down arrow key
-                moveDown();
-                break;
-        }
-    }
+            if (!grid[position].walls[0]) {
+                down = down - 40;
+                position = position - 10;//corecte
+                console.log(position);
+            }
 
-    function moveLeft() {
-        objImage.style.left = parseInt(objImage.style.left) - 40 + 'px';
-        console.log(objImage.style.left);
     }
+    if(keyCode == DOWN_ARROW){
 
-    function moveUp() {
-        objImage.style.top = parseInt(objImage.style.top) - 40 + 'px';
-        console.log(objImage.style.top);
-    }
 
-    function moveRight() {
-        objImage.style.left = parseInt(objImage.style.left) + 40 + 'px';
-        console.log(objImage.style.left);
-    }
+            if (!grid[position].walls[2]) {
+                down = down + 40;
+                position = position + 10;
+                console.log(position);
+            }
 
-    function moveDown() {
-        objImage.style.top = parseInt(objImage.style.top) + 40 + 'px';
-        console.log(objImage.style.top);
     }
+    if(keyCode == RIGHT_ARROW){
+            if (!grid[position].walls[1]) {
+                upp = upp + 40;
+                position = position + 1;
+                console.log(position);
+            }
+
+    }
+    if(keyCode == LEFT_ARROW){
+
+
+            if (!grid[position].walls[3]) {
+                upp = upp - 40;
+                position = position - 1;
+                console.log(position);
+            }
+
+
+    }
+}
+
+    // function getKeyAndMove(e) {
+    //     var key_code = e.which || e.keyCode;
+    //     switch (key_code) {
+    //         case 37: //left arrow key
+    //             moveLeft();
+    //             break;
+    //         case 38: //Up arrow key
+    //             moveUp();
+    //             break;
+    //         case 39: //right arrow key
+    //             moveRight();
+    //             break;
+    //         case 40: //down arrow key
+    //             moveDown();
+    //             break;
+    //     }
+    // }
+    //
+    // function moveLeft() {
+    //     objImage.style.left = parseInt(objImage.style.left) - 40 + 'px';
+    //     console.log(objImage.style.left);
+    // }
+    //
+    // function moveUp() {
+    //     objImage.style.top = parseInt(objImage.style.top) - 40 + 'px';
+    //     console.log(objImage.style.top);
+    // }
+    //
+    // function moveRight() {
+    //     objImage.style.left = parseInt(objImage.style.left) + 40 + 'px';
+    //     console.log(objImage.style.left);
+    // }
+    //
+    // function moveDown() {
+    //     objImage.style.top = parseInt(objImage.style.top) + 40 + 'px';
+    //     console.log(objImage.style.top);
+    // }
 
 
 
